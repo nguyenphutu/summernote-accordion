@@ -1,0 +1,12 @@
+.container h1 {
+  font-size: 45px;
+  text-align: center;
+  padding: 20px 0;
+  font-family: "Comic Sans MS", cursive, sans-serif;
+}
+body {
+  background-image: url('background.jpg');
+  background-size: cover;
+  margin: 0;
+  padding: 0;
+}
