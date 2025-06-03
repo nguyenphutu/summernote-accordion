@@ -110,7 +110,19 @@
       } else {
         // Chèn vào đúng vị trí con trỏ chuột đang đứng
         $('#summernote').summernote('focus');
-        $('#summernote').summernote('pasteHTML', html);
+        // Thêm break line sau khi chèn accordion
+        $('#summernote').summernote('pasteHTML', html + '<p><br></p>'); 
+        // Đặt con trỏ về cuối nội dung
+        var editor = $('#summernote').next('.note-editor').find('.note-editable')[0];
+        if (editor) {
+          var range = document.createRange();
+          var selection = window.getSelection();
+          range.selectNodeContents(editor);
+          range.collapse(false);
+          selection.removeAllRanges();
+          selection.addRange(range);
+          editor.focus();
+        }
       }
       $('#accordionModal').modal('hide');
       // Reset form
