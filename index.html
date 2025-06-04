@@ -14,7 +14,8 @@
   <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.js"></script>
   <!-- import accordion plugin -->
-   <link href="style.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+  <script src="summernote-accordion.js"></script>
 </head>
 
 <body>
@@ -24,113 +25,8 @@
       <div id="summernote"></div>
     </div>
   </div>
-
-  <!-- Accordion Modal -->
-  <div class="modal fade" id="accordionModal" tabindex="-1" role="dialog" aria-labelledby="accordionModalLabel">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <form id="accordionForm">
-          <div class="modal-header">
-            <h4 class="modal-title" id="accordionModalLabel">Thêm Accordion</h4>
-          </div>
-          <div class="modal-body">
-            <div id="accordion-items">
-              <div class="panel panel-default accordion-item">
-                <div class="panel-heading">
-                  <input type="text" class="form-control" name="title[]" placeholder="Tiêu đề mục Accordion" required>
-                </div>
-                <div class="panel-body">
-                  <textarea class="form-control" name="content[]" placeholder="Nội dung" required></textarea>
-                </div>
-              </div>
-            </div>
-            <button type="button" class="btn btn-default" id="addAccordionItem">+ Thêm mục</button>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
-            <button type="submit" class="btn btn-primary">Chèn Accordion</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
   <script>
-    // Summernote Accordion Plugin Button
-    window.AccordionButton = function (context) {
-        var ui = $.summernote.ui;
-        var button = ui.button({
-            contents: '<i class="glyphicon glyphicon-list-alt"></i> Accordion',
-            tooltip: 'Chèn Accordion',
-            click: function () {
-                $('#accordionModal').modal('show');
-            }
-        });
-        return button.render();
-    };
-
-    // Add/Remove Accordion Items
-    $(document).on('click', '#addAccordionItem', function () {
-      var item = $('#accordion-items .accordion-item:first').clone();
-      item.find('input, textarea').val('');
-      $('#accordion-items').append(item);
-    });
-
-    // Handle Accordion Form Submit
-    $('#accordionForm').on('submit', function (e) {
-      e.preventDefault();
-      var $form = $(this);
-      var $editTarget = $form.data('edit-target');
-      var editAccordionId = $form.data('edit-accordion-id');
-      var titles = $("input[name='title[]']").map(function () { return $(this).val(); }).get();
-      var contents = $("textarea[name='content[]']").map(function () { return $(this).val(); }).get();
-      var accordionId = editAccordionId || ('accordion-' + Date.now().toString(36));
-      var html = '<div class="panel-group" id="' + accordionId + '" role="tablist" aria-multiselectable="true">';
-      for (var i = 0; i < titles.length; i++) {
-        var collapseId = accordionId + '-collapse' + i;
-        html +=
-          '<div class="panel panel-default">' +
-          '<div class="panel-heading" role="tab" id="' + collapseId + '-heading" style="cursor:pointer;">' +
-          '<h4 class="panel-title" style="margin:0;">' +
-          '<a class="accordion-toggle' + (i === 0 ? '' : ' collapsed') + '" data-toggle="collapse" data-parent="#' + accordionId + '" href="#' + collapseId + '" aria-expanded="' + (i === 0 ? 'true' : 'false') + '" aria-controls="' + collapseId + '" style="display:block; width:100%; text-decoration:none;">' +
-          titles[i] +
-          '</a>' +
-          '</h4>' +
-          '</div>' +
-          '<div id="' + collapseId + '" class="panel-collapse collapse' + (i === 0 ? ' in' : '') + '" role="tabpanel" aria-labelledby="' + collapseId + '-heading">' +
-          '<div class="panel-body">' + contents[i] + '</div>' +
-          '</div>' +
-          '</div>';
-      }
-      html += '</div>';
-      if ($editTarget && $editTarget.length) {
-        $editTarget.replaceWith($(html));
-        $form.removeData('edit-target');
-        $form.removeData('edit-accordion-id');
-      } else {
-        // Chèn vào đúng vị trí con trỏ chuột đang đứng
-        $('#summernote').summernote('focus');
-        // Thêm break line sau khi chèn accordion
-        $('#summernote').summernote('pasteHTML', html + '<p><br></p>'); 
-        // Đặt con trỏ về cuối nội dung
-        var editor = $('#summernote').next('.note-editor').find('.note-editable')[0];
-        if (editor) {
-          var range = document.createRange();
-          var selection = window.getSelection();
-          range.selectNodeContents(editor);
-          range.collapse(false);
-          selection.removeAllRanges();
-          selection.addRange(range);
-          editor.focus();
-        }
-      }
-      $('#accordionModal').modal('hide');
-      // Reset form
-      $('#accordion-items').html($('#accordion-items .accordion-item:first').clone());
-      $('#accordion-items .accordion-item input, #accordion-items .accordion-item textarea').val('');
-    });
-
-    // Summernote Init
+    // Khởi tạo Summernote với plugin Accordion
     $('#summernote').summernote({
       height: 250,
       toolbar: [
@@ -142,103 +38,9 @@
         ['view', ['fullscreen', 'codeview', 'help']]
       ],
       buttons: {
-        accordion: window.AccordionButton
-      }
-    });
-
-    // Cho phép click vào panel-heading để toggle accordion
-    $(document).on('click', '.panel-heading', function (e) {
-      // Nếu click vào link thì để mặc định
-      if ($(e.target).is('a')) return;
-      var $toggle = $(this).find('a.accordion-toggle');
-      if ($toggle.length) {
-        $toggle.trigger('click');
-      }
-    });
-
-    // Thêm nút Edit/Xóa cho từng accordion khi hover
-    $(document).on('mouseenter', '.panel-group .panel', function () {
-      if ($(this).find('.accordion-edit-btn').length === 0) {
-        var $group = $(this).closest('.panel-group');
-        var groupId = $group.attr('id') || '';
-        var $editBtn = $('<button type="button" class="accordion-edit-btn btn btn-xs btn-info" style="position:absolute;top:8px;right:48px;z-index:10;" title="Sửa"><span class="glyphicon glyphicon-pencil"></span></button>');
-        var $deleteBtn = $('<button type="button" class="accordion-delete-btn btn btn-xs btn-danger" style="position:absolute;top:8px;right:8px;z-index:10;" title="Xóa"><span class="glyphicon glyphicon-trash"></span></button>');
-        $editBtn.attr('data-accordion-id', groupId);
-        $deleteBtn.attr('data-accordion-id', groupId);
-        $(this).css('position', 'relative').append($editBtn).append($deleteBtn);
-      }
-    });
-    $(document).on('mouseleave', '.panel-group .panel', function () {
-      $(this).find('.accordion-edit-btn, .accordion-delete-btn').remove();
-    });
-
-    // Khi click nút Edit, show modal và điền dữ liệu vào form
-    $(document).on('click', '.accordion-edit-btn', function (e) {
-      e.stopPropagation();
-      var accordionId = $(this).attr('data-accordion-id');
-      var $group = $(".panel-group[id='" + accordionId + "']");
-      if ($group.length === 0) return;
-      var $panels = $group.find('.panel');
-      var titles = [];
-      var contents = [];
-      $panels.each(function () {
-        var title = $(this).find('.panel-title a').first().text();
-        var content = $(this).find('.panel-body').first().html();
-        titles.push(title);
-        contents.push(content);
-      });
-      var $items = $('#accordion-items');
-      $items.empty();
-      // Tạo từng accordion-item mới hoàn toàn thay vì clone
-      for (var i = 0; i < titles.length; i++) {
-        var $item = $('<div class="panel panel-default accordion-item">\
-          <div class="panel-heading">\
-            <input type="text" class="form-control" name="title[]" placeholder="Tiêu đề mục Accordion" required>\
-          </div>\
-          <div class="panel-body">\
-            <textarea class="form-control" name="content[]" placeholder="Nội dung" required></textarea>\
-          </div>\
-        </div>');
-        $item.find('input').val(titles[i]);
-        $item.find('textarea').val(contents[i]);
-        $items.append($item);
-      }
-      // Lưu lại accordion đang sửa
-      $('#accordionForm').data('edit-target', $group);
-      $('#accordionForm').data('edit-accordion-id', accordionId);
-      $('#accordionModal').modal('show');
-    });
-
-    // Khi click nút Xóa, xóa accordion khỏi summernote
-    $(document).on('click', '.accordion-delete-btn', function (e) {
-      e.stopPropagation();
-      var accordionId = $(this).attr('data-accordion-id');
-      var $panel = $(this).closest('.panel');
-      console.log('Xóa accordion với ID:', accordionId);
-      console.log('Xóa panel:', $panel);
-      var $group = $(".panel-group#" + accordionId);
-      $panel.remove();
-      if ($group.find('.panel').length === 0) {
-        $group.remove();
-      }
-    });
-
-    // Ngăn không cho focus/click/nhập liệu vào title/body accordion trong editor
-    $(document).on('mousedown click focus keydown keypress input', '.panel-group .panel-title, .panel-group .panel-body', function (e) {
-      // Nếu không phải trong modal thì ngăn chặn hoàn toàn
-      if (!$(this).closest('#accordionModal').length) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
-    });
-    // Ngăn không cho focus/click vào input/textarea trong accordion khi không ở modal
-    $(document).on('mousedown click focus keydown keypress input', '.panel-group .panel input, .panel-group .panel textarea', function (e) {
-      if (!$(this).closest('#accordionModal').length) {
-        e.preventDefault();
-        e.stopPropagation();
-        $(this).blur();
-        return false;
+        accordion: function(context) {
+          return $.summernote.plugins['accordion'] ? context.memo('button.accordion') : 'Accordion';
+        }
       }
     });
   </script>
