@@ -24,8 +24,30 @@
     <div style="background-color: #FFF" class="wrapper">
       <div id="summernote"></div>
     </div>
+    <!-- Nút xuất HTML đặt bên dưới editor -->
+    <button id="exportHtmlBtn" class="btn btn-success" style="margin-top:16px;">
+      <i class="glyphicon glyphicon-export"></i> Xuất HTML
+    </button>
+  </div>
+
+  <!-- Modal Xuất HTML -->
+  <div class="modal fade" id="exportHtmlModal" tabindex="-1" role="dialog" aria-labelledby="exportHtmlModalLabel">
+    <div class="modal-dialog" role="document" style="width:90%;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="exportHtmlModalLabel">HTML Template</h4>
+        </div>
+        <div class="modal-body">
+          <textarea id="exportHtmlContent" class="form-control" rows="20" style="font-family:monospace;"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+        </div>
+      </div>
+    </div>
   </div>
   <script>
+
     // Khởi tạo Summernote với plugin Accordion
     $('#summernote').summernote({
       height: 250,
@@ -35,13 +57,33 @@
           'underline', 'strikethrough', 'superscript', 'subscript', 'clear']],
         ['paragraph style', ['style', 'ol', 'ul', 'paragraph', 'height']],
         ['misc', ['fullscreen', 'codeview', 'undo', 'redo', 'help']],
-        ['view', ['fullscreen', 'codeview', 'help']]
       ],
       buttons: {
-        accordion: function(context) {
+        accordion: function (context) {
           return $.summernote.plugins['accordion'] ? context.memo('button.accordion') : 'Accordion';
         }
       }
+    });
+
+    // Xử lý nút xuất HTML bên dưới editor
+    $('#exportHtmlBtn').on('click', function () {
+      var content = $('#summernote').summernote('code');
+      var html =
+        '<!DOCTYPE html>\n' +
+        '<html>\n' +
+        '<head>\n' +
+        '  <meta charset="utf-8">\n' +
+        '  <title>Exported Template</title>\n' +
+        '  <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">\n' +
+        '  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></scr' + 'ipt>\n' +
+        '  <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></scr' + 'ipt>\n' +
+        '</head>\n' +
+        '<body>\n' +
+        content + '\n' +
+        '</body' + '>\n' +
+        '</html>';
+      $('#exportHtmlContent').val(html);
+      $('#exportHtmlModal').modal('show');
     });
   </script>
 </body>

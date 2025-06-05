@@ -4,7 +4,7 @@
  *
  * Released under the MIT license
  */
-(function(factory) {
+(function (factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as anonymous module.
     define(['jquery'], factory);
@@ -15,11 +15,11 @@
     // Browser globals
     factory(window.jQuery);
   }
-}(function($) {
+}(function ($) {
   $.summernote = $.summernote || {};
   $.summernote.plugins = $.summernote.plugins || {};
 
-  $.summernote.plugins['accordion'] = function(context) {
+  $.summernote.plugins['accordion'] = function (context) {
     var self = this;
     var ui = $.summernote.ui;
     var $editor = context.layoutInfo.editor;
@@ -68,12 +68,12 @@
     var lastRange = null;
 
     // Add Accordion Button
-    context.memo('button.accordion', function() {
+    context.memo('button.accordion', function () {
       ensureAccordionModal();
       return ui.button({
         contents: '<i class="glyphicon glyphicon-list-alt"></i> Accordion',
         tooltip: 'Chèn Accordion',
-        click: function() {
+        click: function () {
           // Lưu lại range trước khi mở modal
           lastRange = context.invoke('editor.createRange');
           showAccordionModal();
@@ -97,17 +97,17 @@
         var $group = $(editTarget);
         var $panels = $group.find('.panel');
         $items.empty();
-        $panels.each(function() {
+        $panels.each(function () {
           var title = $(this).find('.panel-title a').first().text();
           var content = $(this).find('.panel-body').first().html();
           var $item = $(
             '<div class="panel panel-default accordion-item">' +
-              '<div class="panel-heading">' +
-                '<input type="text" class="form-control" name="title[]" placeholder="Tiêu đề mục Accordion" required>' +
-              '</div>' +
-              '<div class="panel-body">' +
-                '<textarea class="form-control" name="content[]" placeholder="Nội dung" required></textarea>' +
-              '</div>' +
+            '<div class="panel-heading">' +
+            '<input type="text" class="form-control" name="title[]" placeholder="Tiêu đề mục Accordion" required>' +
+            '</div>' +
+            '<div class="panel-body">' +
+            '<textarea class="form-control" name="content[]" placeholder="Nội dung" required></textarea>' +
+            '</div>' +
             '</div>'
           );
           $item.find('input').val(title);
@@ -130,29 +130,29 @@
     // Handle Accordion Form Submit
     $(document)
       .off('submit.smn-acc')
-      .on('submit.smn-acc', '#accordionForm', function(e) {
+      .on('submit.smn-acc', '#accordionForm', function (e) {
         e.preventDefault();
         var $form = $(this);
         var $editTarget = $form.data('edit-target');
         var editAccordionId = $form.data('edit-accordion-id');
-        var titles = $form.find("input[name='title[]']").map(function() { return $(this).val(); }).get();
-        var contents = $form.find("textarea[name='content[]']").map(function() { return $(this).val(); }).get();
+        var titles = $form.find("input[name='title[]']").map(function () { return $(this).val(); }).get();
+        var contents = $form.find("textarea[name='content[]']").map(function () { return $(this).val(); }).get();
         var accordionId = editAccordionId || ('accordion-' + Date.now().toString(36));
         var html = '<div class="panel-group" id="' + accordionId + '" role="tablist" aria-multiselectable="true">';
         for (var i = 0; i < titles.length; i++) {
           var collapseId = accordionId + '-collapse' + i;
           html +=
             '<div class="panel panel-default">' +
-              '<div class="panel-heading" role="tab" id="' + collapseId + '-heading" style="cursor:pointer;">' +
-                '<h4 class="panel-title" style="margin:0;">' +
-                  '<a class="accordion-toggle' + (i === 0 ? '' : ' collapsed') + '" data-toggle="collapse" data-parent="#' + accordionId + '" href="#' + collapseId + '" aria-expanded="' + (i === 0 ? 'true' : 'false') + '" aria-controls="' + collapseId + '" style="display:block; width:100%; text-decoration:none;">' +
-                    titles[i] +
-                  '</a>' +
-                '</h4>' +
-              '</div>' +
-              '<div id="' + collapseId + '" class="panel-collapse collapse' + (i === 0 ? ' in' : '') + '" role="tabpanel" aria-labelledby="' + collapseId + '-heading">' +
-                '<div class="panel-body">' + contents[i] + '</div>' +
-              '</div>' +
+            '<div class="panel-heading" role="tab" id="' + collapseId + '-heading" style="cursor:pointer;">' +
+            '<h4 class="panel-title" style="margin:0;">' +
+            '<a class="accordion-toggle' + (i === 0 ? '' : ' collapsed') + '" data-toggle="collapse" data-parent="#' + accordionId + '" href="#' + collapseId + '" aria-expanded="' + (i === 0 ? 'true' : 'false') + '" aria-controls="' + collapseId + '" style="display:block; width:100%; text-decoration:none;">' +
+            titles[i] +
+            '</a>' +
+            '</h4>' +
+            '</div>' +
+            '<div id="' + collapseId + '" class="panel-collapse collapse' + (i === 0 ? ' in' : '') + '" role="tabpanel" aria-labelledby="' + collapseId + '-heading">' +
+            '<div class="panel-body">' + contents[i] + '</div>' +
+            '</div>' +
             '</div>';
         }
         if ($editTarget && $editTarget.length) {
@@ -171,7 +171,7 @@
             tempDiv.innerHTML = html;
             var nodes = Array.from(tempDiv.childNodes);
             var lastNode = null;
-            nodes.forEach(function(node) {
+            nodes.forEach(function (node) {
               lastNode = range.insertNode(node.cloneNode(true));
             });
             // Thêm 1 dòng trống sau accordion
@@ -194,7 +194,7 @@
           } else {
             context.invoke('editor.pasteHTML', html + '<p><br></p>');
             // Đặt con trỏ vào cuối editor (fallback)
-            setTimeout(function() {
+            setTimeout(function () {
               var editor = $editable[0];
               if (editor) {
                 var range2 = document.createRange();
@@ -220,7 +220,7 @@
     // Toggle accordion on heading click
     $(document)
       .off('click.smn-acc-heading')
-      .on('click.smn-acc-heading', '.panel-heading', function(e) {
+      .on('click.smn-acc-heading', '.panel-heading', function (e) {
         if ($(e.target).is('a')) return;
         var $toggle = $(this).find('a.accordion-toggle');
         if ($toggle.length) { $toggle.trigger('click'); }
@@ -229,7 +229,7 @@
     // Add Edit/Delete buttons on hover
     $(document)
       .off('mouseenter.smn-acc')
-      .on('mouseenter.smn-acc', '.panel-group .panel', function() {
+      .on('mouseenter.smn-acc', '.panel-group .panel', function () {
         if ($(this).find('.accordion-edit-btn').length === 0) {
           var $group = $(this).closest('.panel-group');
           var groupId = $group.attr('id') || '';
@@ -242,14 +242,14 @@
       });
     $(document)
       .off('mouseleave.smn-acc')
-      .on('mouseleave.smn-acc', '.panel-group .panel', function() {
+      .on('mouseleave.smn-acc', '.panel-group .panel', function () {
         $(this).find('.accordion-edit-btn, .accordion-delete-btn').remove();
       });
 
     // Edit
     $(document)
       .off('click.smn-acc-edit')
-      .on('click.smn-acc-edit', '.accordion-edit-btn', function(e) {
+      .on('click.smn-acc-edit', '.accordion-edit-btn', function (e) {
         e.stopPropagation();
         var accordionId = $(this).attr('data-accordion-id');
         var $group = $(".panel-group[id='" + accordionId + "']");
@@ -260,7 +260,7 @@
     // Delete
     $(document)
       .off('click.smn-acc-delete')
-      .on('click.smn-acc-delete', '.accordion-delete-btn', function(e) {
+      .on('click.smn-acc-delete', '.accordion-delete-btn', function (e) {
         e.stopPropagation();
         var accordionId = $(this).attr('data-accordion-id');
         var $panel = $(this).closest('.panel');
@@ -272,7 +272,7 @@
     // Prevent editing accordion in editor
     $(document)
       .off('mousedown.smn-acc click.smn-acc focus.smn-acc keydown.smn-acc keypress.smn-acc input.smn-acc')
-      .on('mousedown.smn-acc click.smn-acc focus.smn-acc keydown.smn-acc keypress.smn-acc input.smn-acc', '.panel-group .panel-title, .panel-group .panel-body', function(e) {
+      .on('mousedown.smn-acc click.smn-acc focus.smn-acc keydown.smn-acc keypress.smn-acc input.smn-acc', '.panel-group .panel-title, .panel-group .panel-body', function (e) {
         if (!$(this).closest('#accordionModal').length) {
           e.preventDefault();
           e.stopPropagation();
@@ -281,7 +281,7 @@
       });
     $(document)
       .off('mousedown.smn-acc2 click.smn-acc2 focus.smn-acc2 keydown.smn-acc2 keypress.smn-acc2 input.smn-acc2')
-      .on('mousedown.smn-acc2 click.smn-acc2 focus.smn-acc2 keydown.smn-acc2 keypress.smn-acc2 input.smn-acc2', '.panel-group .panel input, .panel-group .panel textarea', function(e) {
+      .on('mousedown.smn-acc2 click.smn-acc2 focus.smn-acc2 keydown.smn-acc2 keypress.smn-acc2 input.smn-acc2', '.panel-group .panel input, .panel-group .panel textarea', function (e) {
         if (!$(this).closest('#accordionModal').length) {
           e.preventDefault();
           e.stopPropagation();
