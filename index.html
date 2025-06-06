@@ -26,21 +26,23 @@
     </div>
     <!-- Nút xuất HTML đặt bên dưới editor -->
     <button id="exportHtmlBtn" class="btn btn-success" style="margin-top:16px;">
-      <i class="glyphicon glyphicon-export"></i> Xuất HTML
+      <i class="glyphicon glyphicon-eye-open"></i> Preview
     </button>
   </div>
 
   <!-- Modal Xuất HTML -->
   <div class="modal fade" id="exportHtmlModal" tabindex="-1" role="dialog" aria-labelledby="exportHtmlModalLabel">
-    <div class="modal-dialog" role="document" style="width:90%;">
+    <div class="modal-dialog" role="document" style="width:80%;">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title" id="exportHtmlModalLabel">HTML Template</h4>
+          <h4 class="modal-title" id="exportHtmlModalLabel">Preview</h4>
         </div>
         <div class="modal-body">
-          <textarea id="exportHtmlContent" class="form-control" rows="20" style="font-family:monospace;"></textarea>
+          <!-- iframe để xem trước nội dung HTML -->
+          <iframe id="exportHtmlIframe" style="width:100%;height:70vh;border:1px solid #ccc;"></iframe>
         </div>
         <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="downloadHtmlBtn">Tải xuống HTML</button>
           <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
         </div>
       </div>
@@ -82,8 +84,34 @@
         content + '\n' +
         '</body' + '>\n' +
         '</html>';
-      $('#exportHtmlContent').val(html);
+      // Tạo Blob và URL cho iframe
+      var blob = new Blob([html], { type: 'text/html' });
+      var url = URL.createObjectURL(blob);
+      $('#exportHtmlIframe').attr('src', url);
       $('#exportHtmlModal').modal('show');
+      // Lưu blob và url vào modal để dùng cho nút tải xuống
+      $('#exportHtmlModal').data('blob', blob).data('blobUrl', url);
+      // Giải phóng URL khi modal đóng
+      $('#exportHtmlModal').one('hidden.bs.modal', function () {
+        URL.revokeObjectURL(url);
+        $('#exportHtmlIframe').attr('src', 'about:blank');
+        $(this).removeData('blob').removeData('blobUrl');
+      });
+    });
+    // Xử lý nút tải xuống file HTML trong modal
+    $(document).on('click', '#downloadHtmlBtn', function () {
+      var $modal = $('#exportHtmlModal');
+      var blob = $modal.data('blob');
+      if (!blob) return;
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'preview.html';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function() {
+        URL.revokeObjectURL(a.href);
+        document.body.removeChild(a);
+      }, 100);
     });
   </script>
 </body>
